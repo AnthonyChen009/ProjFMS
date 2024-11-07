@@ -1,6 +1,6 @@
 let jetFont;
 let count = 20;
-let timeToHit = 0;
+let timeToHit = [];
 let needs_redraw = true;
 let homeButton;
 let width;
@@ -8,6 +8,9 @@ let height;
 let paused = false;
 let started = false; 
 let targetButton;
+let startTime = 0;
+let currentTime = 0;
+let resetButton;
 
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
@@ -21,6 +24,7 @@ function setup() {
 	width = windowWidth;
   height = windowHeight;
   createCanvas(width, height);
+  targetButton = createButton('X');
 }
 
 function draw() {
@@ -47,21 +51,62 @@ function drawPanel() {
 }
 
 function gameLoop() {
+
+  
+  if (count <= 0) {
+    return;
+  }
+
+  if (count % 2 == 0) {
+    startTime = millis();
+  }
+  else {
+    currentTime = millis();
+    timeToHit.push(currentTime - startTime);
+  }
+  console.log(timeToHit);
 	drawPanel();
+  count--;
+
 	let x = random((width/2) - (600/2) + 10, (width/2) - (600/2) + 540);
+  let y = random(60, 395);
+  targetButton.position(x, y);
+  fill("#444444");
+  rect((width/2) - (200/2), 500, 200, 50, 20);
+  fill("white");
+  text("Remaining: " + count,(width / 2) - (textWidth("Remaining: " + count)/2), 535);
+  if (count <= 0) {
+    let avg = 0;
+    for (let i = 0; i < timeToHit.length; i++) {
+      avg += timeToHit[i];
+    }
+    avg /= timeToHit.length;
+    //noLoop();
+    fill("#444444");
+    rect((width/2) - (200/2), 560, 200, 50, 20);
+    fill("white");
+    text("Time: " + Math.floor(avg),(width / 2) - (textWidth("Time " + Math.floor(avg))/2), 560 + 35);
+  }
+
 }
 
 function makeGamePage() {
   // Create the "Back to Home" button
 	background("#333437");
+  drawPanel();
   textSize(20);
   fill("white");
-  text("Mouse Movement Game", 20, 40);
+  text("Mouse Accuracy Game", 20, 40);
   homeButton = createButton('Back to Home');
-	targetButton = createButton('X');
-	targetButton.position(width/2 - targetButton/2, 240);
+	
+	targetButton.position(width/2 - targetButton/2, 235);
+  targetButton.mousePressed(gameLoop);
+  resetButton = createButton("Reset");
+  resetButton.position(width/2 - resetButton/2, 460);
   homeButton.position(width - homeButton.width - 50, 20);
   homeButton.mousePressed(goToHome);
+
+  resetButton.mousePressed(reset);
   // Optional styling
   homeButton.style('background-color', '#444444');
   homeButton.style('font-family', 'JetBrains Mono');
@@ -73,6 +118,12 @@ function makeGamePage() {
   targetButton.style('border-radius', '5px');
 	targetButton.style('padding', '15px 20px');
 	targetButton.style('background-color', '#0ced4f');
+
+  resetButton.style('background-color', '#444444');
+  resetButton.style('border', '5px');
+  resetButton.style('color', 'white');
+  resetButton.style('padding', '5px 10px');
+  resetButton.style('border-radius', '5px');
 }
 
 function windowResized() {
@@ -86,16 +137,20 @@ function windowResized() {
   
 }
 
-function clicked() {
-	count--;
-}
-
 function goToHome() {
   window.location.href = 'index.html';
 }
 
+function reset(){
+  count = 30;
+  timeToHit = [];
+  makeGamePage();
+  targetButton.position((width/2) - (targetButton.width/2) - 10, 235);
+  needs_redraw = true;
+}
+
 function checkHover() {
-  const buttons = [homeButton];
+  const buttons = [homeButton, resetButton];
 
   for (const button of buttons) {
     if (button.elt.matches(':hover')) {
