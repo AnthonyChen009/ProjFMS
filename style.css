@@ -1,0 +1,42 @@
+html, body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Spectral', serif;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.button {
+  background-color: #444444;
+  color: #fff;
+  padding: 15px 30px;
+  border: none;
+  font-size: 1em;
+  transition: background-color 0.3s;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.button:hover {
+  background-color: #666;
+}
+
+/* Main Menu Styling */
+#mainMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+canvas {
+  display: block;
+}
