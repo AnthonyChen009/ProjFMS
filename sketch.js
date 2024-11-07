@@ -35,34 +35,7 @@ let time20;
 let time30;
 let isTabPressed = false;
 let isEnterPressed = false;
-class character {
-  constructor(x, y, size, color, letter, typed) {
-    this.x = x;
-    this.y = y;
-    this.size = size;
-    this.color = color;
-    this.letter = letter;
-    this.speed = 5; // speed of the character's movement
-    this.typed = typed;
-  }
 
-  print() {
-    text(this.letter, this.x, this.y);
-  }
-
-  change_typed(bool) {
-    this.typed = bool;
-  }
-
-  change_color(new_col){
-    this.color = new_col;
-  }
-
-  setpos(x, y){
-    this.x = x;
-    this.y = y;
-  }
-}
 
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
