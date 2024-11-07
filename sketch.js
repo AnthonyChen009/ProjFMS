@@ -35,7 +35,9 @@ let time20;
 let time30;
 let isTabPressed = false;
 let isEnterPressed = false;
-
+let canReset = true;
+let endEarly = false;
+let timeLeft = 0;
 
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
@@ -95,6 +97,7 @@ function draw() {
 
     let timeString;
     if (game_started) {
+      canReset = false;
       finished = false;
       elapsedTime = millis() - startTime;
       remainingTime = targetTime - elapsedTime + 1000; 
@@ -120,8 +123,9 @@ function draw() {
       text(timeString, (width / 2) - (textWidth(timeString)/2) , height / 2);
     }
 
-    if (floor(remainingTime / 1000) % 60 < 1) {
+    if ((floor(remainingTime / 1000) % 60 < 1) || endEarly) {
       // Handle timer completion here, e.g., display a message
+      timeLeft = targetTime - remainingTime;
       textSize(24);
       finished = true;
       game_started = false;
@@ -138,7 +142,7 @@ function draw() {
 
 function calculateScore() {
   let charCount = !is_correct.length? 0 : is_correct.length;
-  let time = targetTime / 1000;
+  let time = timeLeft / 1000;
   let words = charCount/4.7;
   let wpm = (words/time) * 60;
   return wpm;
@@ -204,8 +208,13 @@ function keyPressed() {
       }
     }
 
-    currentX++;
-    currentY++;
+    if (currentX < characters.length) {
+      currentX++;
+      currentY++;
+    }
+    else{
+      endEarly = true;
+    }
     
   }
   else {
@@ -215,7 +224,7 @@ function keyPressed() {
     game_started = true;
     finished = false;
   }
-  if (keyCode === BACKSPACE && finished && !game_started) {
+  if (keyCode === BACKSPACE && finished && !game_started && canReset) {
     resetWords();
   }
   
@@ -371,6 +380,8 @@ function calcMissedKeys() {
 }
 
 function resetWords() {
+  endEarly = false;
+  canReset = true;
   is_correct = [];
   words = [];
   characters = [];
