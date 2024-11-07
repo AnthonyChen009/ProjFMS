@@ -179,54 +179,15 @@ function addTips() {
 }
 
 function checkHover() {
-  if (homeButton.elt.matches(':hover')) {
-    // Change the button color when hovering
-    homeButton.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    homeButton.style('background-color', '#444444');
-  }
+  const buttons = [homeButton, time5, time10, time15, time20, time30];
 
-  if (time5.elt.matches(':hover')) {
-    // Change the button color when hovering
-    time5.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    time5.style('background-color', '#444444');
+  for (const button of buttons) {
+    if (button.elt.matches(':hover')) {
+      button.style('background-color', '#666666');
+    } else {
+      button.style('background-color', '#444444');
+    }
   }
-
-  if (time10.elt.matches(':hover')) {
-    // Change the button color when hovering
-    time10.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    time10.style('background-color', '#444444');
-  }
-
-  if (time15.elt.matches(':hover')) {
-    // Change the button color when hovering
-    time15.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    time15.style('background-color', '#444444');
-  }
-
-  if (time20.elt.matches(':hover')) {
-    // Change the button color when hovering
-    time20.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    time20.style('background-color', '#444444');
-  }
-
-  if (time30.elt.matches(':hover')) {
-    // Change the button color when hovering
-    time30.style('background-color', '#666666');
-  } else {
-    // Reset the button color when not hovering
-    time30.style('background-color', '#444444');
-  }
-
 }
 
 function keyPressed() {
