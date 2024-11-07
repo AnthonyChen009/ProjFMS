@@ -368,26 +368,33 @@ function statPanel() {
   let keysMissed = calcMissedKeys();
   textSize(25);
   fill("#444444");
-  rect((width/2) - (windowWidth/4) + 300, 550, windowWidth/2 - 600, 200, 20);
+  rect((width/2) - (windowWidth/4), 550, windowWidth/2, 200, 20);
   fill("White");
-  text("WPM: " + str(wpm), (width/2) - (windowWidth/4) + 300 + 20, 550 + 50);
-  text("Missed Keys:", (width/2) - (windowWidth/4) + 300 + 20, 550 + 50 + 35);
-  text("(" + keysMissed + ")", (width/2) - (textWidth(keysMissed)/2) - 20, 550 + 50 + 35 + 40);
+  text("WPM: " + str(wpm), (width/2) - (windowWidth/4) + 20, 550 + 50);
+  text("Frequently Missed:", (width/2) - (windowWidth/4) + 20, 550 + 50 + 35);
+  text(keysMissed, (width/2) - (textWidth(keysMissed)/2) - 20, 550 + 50 + 35 + 40);
 }
 
 function calcMissedKeys() {
-  let missed = "";
 
+  let missed = [];
+  const frequencyMap = {};
+  let rtn = [];
   for (let i = 0; i < is_correct.length; i++) {
-    if (!is_correct[i] && !missed.includes(characters[i])) {
-      missed += characters[i];
-      if (i < is_correct.length - 1) {
-        missed += ", ";
-      }
+    if (!is_correct[i]) {
+      missed.push(characters[i]);
     }
   }
 
-  return missed || "None";
+  for (const element of missed) {
+    frequencyMap[element] = (frequencyMap[element] || 0) + 1;
+
+    if (frequencyMap[element] >= 3 && !rtn.includes(element)) {
+      rtn.push(element);
+    }
+  }
+
+  return rtn || "None";
 }
 
 function resetWords() {
