@@ -64,9 +64,6 @@ function checkRectHover() {
     }
   }
 }
-function drawMaze() {
-  changeCell(0, 0, "White");
-}
 
 function mouseMoved() {
   
@@ -123,7 +120,6 @@ function drawPanel() {
     
 
   }
-  drawMaze();
 }
 
 function changeCell(x, y, color) {
