@@ -125,6 +125,19 @@ function makeGamePage() {
   resetButton.style('border-radius', '5px');
 }
 
+function generateMaze() {
+  for (let x = 0; x < 10; x++) {
+    
+    for (let y = 0; y < 7; y++) {
+      //fill("black");
+      changeCell(x, y, "White");
+      rectColor.push("white");
+      rectx.push((width/2) - (600/2) + (60 * x));
+      recty.push(110 + (60 * y) - 60);
+    }
+  }
+}
+
 function goToHome() {
   window.location.href = 'index.html';
 }
