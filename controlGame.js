@@ -117,10 +117,4 @@ function windowResized() {
   
   needs_redraw = true;
 	makeGamePage();
-<<<<<<< HEAD
-  //Hello this is a test push
-  const test = 0;
-=======
-  
->>>>>>> b8c001cf4e05e817f3eaf25322d60ea351535ca5
 }
