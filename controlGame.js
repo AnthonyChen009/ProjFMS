@@ -64,6 +64,9 @@ function checkRectHover() {
     }
   }
 }
+function drawMaze() {
+  changeCell(0, 0, "White");
+}
 
 function mouseMoved() {
   
@@ -96,6 +99,7 @@ function drawPanel() {
       recty.push(110 + (60 * y) - 60);
     }
   }
+
   //generate random path
   let startx = 0;
   let starty = 0;
@@ -119,6 +123,7 @@ function drawPanel() {
     
 
   }
+  drawMaze();
 }
 
 function changeCell(x, y, color) {
@@ -161,6 +166,7 @@ function makeGamePage() {
   resetButton.style('padding', '5px 10px');
   resetButton.style('border-radius', '5px');
 }
+
 
 function goToHome() {
   window.location.href = 'index.html';
