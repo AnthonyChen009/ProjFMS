@@ -10,6 +10,18 @@ let recty = [];
 let rectColor= [];
 let is_hovered = false;
 
+
+function getRandomDirection() {
+  const directions = [
+    { dx: 1, dy: 0 },  // Right
+    { dx: -1, dy: 0 }, // Left
+    { dx: 0, dy: 1 },  // Down
+    { dx: 0, dy: -1 }  // Up
+  ];
+  const randomIndex = Math.floor(Math.random() * directions.length);
+  return directions[randomIndex];
+}
+
 function setup() {
   loadFont("JetBrainsMono-Regular.ttf", font => {
     textFont(font);
@@ -44,7 +56,9 @@ function checkRectHover() {
       let x = rectx[i];
       let y = recty[j];
       if (mouseX >= rectx[i] && mouseX <= rectx[i] + 60 && mouseY >= recty[j] && mouseY <= recty[j] + 60) {
-        changeCellAbsPos(x, y, "green");
+        if (mouseIsPressed) {
+          changeCellAbsPos(x, y, "green");
+        }
       }
       
     }
@@ -81,6 +95,29 @@ function drawPanel() {
       rectx.push((width/2) - (600/2) + (60 * x));
       recty.push(110 + (60 * y) - 60);
     }
+  }
+  //generate random path
+  let startx = 0;
+  let starty = 0;
+  changeCell(startx, starty, "white");
+  for (let i = 0; i < 20; i++) {
+    let { dx, dy } = getRandomDirection();
+    let newX = startx + dx;
+    let newY = starty + dy;
+
+    while ((newX < 0 && newX > 9 ) || (newY < 0 && newY > 6 ) ) {
+      const { newdx, newdy } = getRandomDirection();
+      newX = startx + newdx;
+      newY = starty + newdy;
+    }
+    if ((newX >= 0 && newX < 10 ) && (newY > 0 && newY < 7 ) ) {
+      startx = newX;
+      starty = newY;
+      changeCell(newX, newY, "white");
+    }
+
+    
+
   }
 }
 
