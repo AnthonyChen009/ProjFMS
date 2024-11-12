@@ -154,5 +154,4 @@ function windowResized() {
   
   needs_redraw = true;
 	makeGamePage();
-  
 }
