@@ -44,7 +44,7 @@ function checkRectHover() {
       let x = rectx[i];
       let y = recty[j];
       if (mouseX >= rectx[i] && mouseX <= rectx[i] + 60 && mouseY >= recty[j] && mouseY <= recty[j] + 60) {
-        changeCellAbsPos(x, y, "green");
+        changeCellAbsPos(x, y, "red");
       }
       
     }
