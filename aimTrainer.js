@@ -1,5 +1,5 @@
 let jetFont;
-let count = 20;
+let count = 3;
 let timeToHit = [];
 let needs_redraw = true;
 let homeButton;
@@ -85,7 +85,7 @@ function gameLoop() {
     fill("#444444");
     rect((width/2) - (200/2), 560, 200, 50, 20);
     fill("white");
-    text("Time: " + Math.floor(avg),(width / 2) - (textWidth("Time " + Math.floor(avg))/2), 560 + 35);
+    text("Time: " + Math.floor(avg) + " ms",(width / 2) - (textWidth("Time " + (Math.floor(avg))  + " ms")) / 2, 560 + 35);
   }
 
 }
