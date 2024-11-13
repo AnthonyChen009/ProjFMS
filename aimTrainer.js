@@ -1,5 +1,5 @@
 let jetFont;
-let count = 3;
+let count = 30;
 let timeToHit = [];
 let needs_redraw = true;
 let homeButton;
