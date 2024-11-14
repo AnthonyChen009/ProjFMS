@@ -14,30 +14,9 @@ let lineArrHorizontal = [];
 let prevCell;
 let currentTime = 0;
 let startTime = 0;
-//line class
+let possibleCells = [];
 
-class Line {
-  constructor(x1, y1, x2, y2) {
-    this.x1 = x1;
-    this.y1 = y1;
-    this.x2 = x2;
-    this.y2 = y2;
-    this.hidden = false;
-  }
-
-  // Method to display the line
-  display() {
-    if (!this.hidden) {
-      line(this.x1, this.y1, this.x2, this.y2);
-      
-    }
-  }
-
-  setHidden(x) {
-    this.hidden = x;
-  }
-}
-
+//cell class
 class Cell {
   constructor(x1, y1, color) {
     this.x1 = x1;
@@ -49,9 +28,7 @@ class Cell {
     this.bottomWallHidden = false;
     this.visited = false;
   }
-
   display() {
-    
     noStroke();
     fill(this.color);
     rect(this.x1, this.y1, 60, 60);
@@ -89,7 +66,7 @@ class Cell {
     this.display();
   }
   breakWall(wall) {
-    //0 - 4
+
     switch(wall) {
       case 0:
         this.topWallHidden = true;
@@ -144,18 +121,6 @@ class Cell {
   }
 }
 
-
-function getRandomDirection() {
-  const directions = [
-    { dx: 1, dy: 0 },  // Right
-    { dx: -1, dy: 0 }, // Left
-    { dx: 0, dy: 1 },  // Down
-    { dx: 0, dy: -1 }  // Up
-  ];
-  const randomIndex = Math.floor(Math.random() * directions.length);
-  return directions[randomIndex];
-}
-
 //loads font and sets canvas size
 function setup() {
   loadFont("JetBrainsMono-Regular.ttf", font => {
@@ -164,10 +129,11 @@ function setup() {
   width = windowWidth;
   height = windowHeight;
   createCanvas(width, height);
+  
 }
 
 function draw() {
-	
+	//only draw if needed
 	if (needs_redraw) {
     resetText = true;
     homeButton = null;
@@ -176,6 +142,7 @@ function draw() {
 		drawPanel()
     needs_redraw = false;
     prevCell = cellArr[0 * 7 + 0];
+    possibleCells = getPossibleNeighbors(prevCell);
     noStroke();
     fill("white");
     text("Start at red square and drag to yellow", 20, height - 50);
@@ -186,7 +153,6 @@ function draw() {
   
 	if (!paused && started) {
 		if (!mouseIsPressed) {
-      print("Failed");
       fill("#444444");
       noStroke();
       rect((width/2) - (200/2), 560, 200, 50, 20);
@@ -199,32 +165,27 @@ function draw() {
   
 }
 
+
+
 function checkRectHover() {
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 7; j++) {
-      
-      let cell = cellArr[i * 7 + j];
-      //print(cell);
-      
+      let cell = cellArr[i * 7 + j];      
+
       if (mouseX >= cell.getX1() && mouseX <= cell.getX1() + 60 && mouseY >= cell.getY1() && mouseY <= cell.getY1() + 60) {
         if (mouseIsPressed) {
-          
-          if (prevCell && prevCell !== cell) {
-            //prevCell.changeColor("green");
-          }
-
-          //draw only if wall was broken
-          let dir = getCellDir(prevCell, cell);
-
-          if(prevCell.getWallStat(dir) === true) {
+          //only go to cell if the cell can be reached
+          if(possibleCells.find(item => item === cell)) {
             if (!started) {
               startTime = millis();
             }
             started = true;
-
             prevCell.changeColor("red");
             prevCell = cell;
+            possibleCells = getPossibleNeighbors(cell);
             cell.changeColor("green");
+            
+            //draw time box
             if (cell.getX1Rel() == 9 && cell.getY1Rel() == 6) {
               fill("#444444");
               noStroke();
@@ -235,19 +196,30 @@ function checkRectHover() {
               noLoop();
             }
           }
-          
-          
-          
-          
-
         }
-      }
-      
-    }
-    
+      } 
+    } 
+  }  
+}
+
+function getPossibleNeighbors(cell){
+  let CellsRtn = [];
+
+  if (cell.topWallHidden) {
+    CellsRtn.push(cellArr[cell.getX1Rel() * 7 + cell.getY1Rel() - 1]);
   }
-  
-  
+  if (cell.rightWallHidden) {
+    CellsRtn.push(cellArr[(cell.getX1Rel() + 1) * 7 + cell.getY1Rel()]);
+  }
+  if (cell.bottomWallHidden) {
+    CellsRtn.push(cellArr[cell.getX1Rel() * 7 + cell.getY1Rel() + 1]);
+  }
+  if (cell.leftWallHidden) {
+    CellsRtn.push(cellArr[(cell.getX1Rel() - 1) * 7 + cell.getY1Rel()]);
+  }
+
+
+  return CellsRtn;
 }
 
 function drawRect() {
@@ -279,17 +251,13 @@ function drawPanel() {
     }
   }
   generateMaze();
+  //draw rect to clear any drawing that may have happened so that it doesnt interfere
   drawRect();
-  for (let x = 0; x < 10; x++) {
-    
-    for (let y = 0; y < 7; y++) {
-      cellArr[x * 7 + y].display();
-    }
-  }
+  drawMaze();
   
 }
 
-let canGo = true;
+
 
 function generateMaze() {
   let stack = [];
@@ -297,38 +265,29 @@ function generateMaze() {
   stack.push(start);
   start.visited = true;
   start.changeColor("red");
-  while(stack.length > 0 && canGo) {
-    
-    
+  while(stack.length > 0) {
     let current = stack[stack.length - 1];
     let tmp = getUnvisitedNeighbors(current);
     
     if (tmp.length > 0) {
-      
       let next = tmp[getRandomInt(0, tmp.length - 1)];
-      // remove wall
-      //print (tmp)
+      //remove wall
       removeWall(current, next);
       next.visited = true;
-      //next.changeColor("green")
       stack.push(next);
     }
     else {
       stack.pop();
     }
-    
-    
-    
   }
-
   cellArr[9 * 7 + 6].changeColor("yellow");
-  
 }
 
-function keyPressed() {
-  // Check if the pressed key is a letter (a-z or A-Z)
-  if (keyCode === SHIFT) {
-    canGo = true;
+function drawMaze() {
+  for (let x = 0; x < 10; x++) {
+    for (let y = 0; y < 7; y++) {
+      cellArr[x * 7 + y].display();
+    }
   }
 }
 
@@ -338,8 +297,6 @@ function getRandomInt(min, max) {
 
 function removeWall(currentCell, next) {
   // check direction
-  
-  let dir = 0;
   if (currentCell.getX1Rel() > next.getX1Rel()) {
     currentCell.breakWall(3);
       next.breakWall(1);
