@@ -179,8 +179,6 @@ function keyPressed() {
   }
   is_typing = true;
   if (key.length === 1 && key.match(/[a-zA-Z]/) && !finished) {
-    console.log("asd");
-    console.log(currentX);
     resetText = true;
     make_window();
     //rect(xpos[currentX] - 2, ypos[currentY] - 25, 2, 30);
@@ -209,6 +207,7 @@ function keyPressed() {
     }
 
     if (currentX < characters.length) {
+      
       currentX++;
       currentY++;
     }
@@ -227,7 +226,27 @@ function keyPressed() {
   if (keyCode === BACKSPACE && finished && !game_started && canReset) {
     resetWords();
   }
-  
+  else if (keyCode === BACKSPACE && !finished && game_started && !canReset) {
+    if (currentX > 0) {
+      is_correct.pop();
+      currentX--;
+      currentY--;
+    }
+    resetText = true;
+    make_window();
+
+    for (let i = 0; i < currentX; i++) {
+      if (is_correct[i]) {
+        fill("white");
+        text(characters[i], xpos[i], ypos[i]);
+      }
+      else{
+        fill("red");
+        text(characters[i], xpos[i], ypos[i]);   
+      }
+    }
+  }
+
   setTimeout(() => {
     is_typing = false;
   }, 3000);
@@ -344,17 +363,22 @@ function goToHome() {
 
 function statPanel() {
   let wpm = 0;
+  let count = 0;
+  let result = 0;
   if (is_correct.length) {
     wpm = Math.round(calculateScore());
+    count = is_correct.filter(item => item === false).length;
+    result = ((is_correct.length - count) / is_correct.length) * 100;
   }
   let keysMissed = calcMissedKeys();
+
   textSize(25);
   fill("#444444");
   rect((width/2) - (windowWidth/4), 550, windowWidth/2, 200, 20);
   fill("White");
   text("WPM: " + str(wpm), (width/2) - (windowWidth/4) + 20, 550 + 50);
-  text("Frequently Missed:", (width/2) - (windowWidth/4) + 20, 550 + 50 + 35);
-  text(keysMissed, (width/2) - (textWidth(keysMissed)/2) - 20, 550 + 50 + 35 + 40);
+  text("Frequently Missed: " + keysMissed, (width/2) - (windowWidth/4) + 20, 550 + 50 + 35);
+  text("Accuracy: " + (result) + "%", (width/2) - (windowWidth/4) + 20, 550 + 50 + 35 + 35);
 }
 
 function calcMissedKeys() {
@@ -418,7 +442,7 @@ function resetSketch() {
   currentX = 0;
   currentY = 0
   background("#333437");
-  resetWords()
+  resetWords();
   makeGamePage();
   needs_redraw = true;
   make_window();
