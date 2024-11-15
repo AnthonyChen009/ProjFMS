@@ -15,8 +15,11 @@ let prevCell;
 let currentTime = 0;
 let startTime = 0;
 let possibleCells = [];
-let sizeSetting = 60;
-
+let sizeSetting = 15;
+let easyButton;
+let mediumButton;
+let hardButton;
+let selectedSetting;
 //cell class
 class Cell {
   constructor(x1, y1, size, color) {
@@ -29,6 +32,7 @@ class Cell {
     this.rightWallHidden = false;
     this.bottomWallHidden = false;
     this.visited = false;
+    this.isFinalCell = false;
   }
   display() {
     noStroke();
@@ -60,7 +64,7 @@ class Cell {
     return (this.x1 - (width / 2) + (300))/ this.size;
   }
   getY1Rel() {
-    return (this.y1 + this.size - 110) / this.size;
+    return (this.y1 + 60 - 110) / this.size;
   }
 
   changeColor(col){
@@ -174,8 +178,9 @@ function checkRectHover() {
     for (let j = 0; j < 420/sizeSetting; j++) {
       let cell = cellArr[i * 420/sizeSetting + j];      
 
-      if (mouseX >= cell.getX1() && mouseX <= cell.getX1() + 60 && mouseY >= cell.getY1() && mouseY <= cell.getY1() + 60) {
+      if (mouseX >= cell.getX1() && mouseX <= cell.getX1() + sizeSetting && mouseY >= cell.getY1() && mouseY <= cell.getY1() + sizeSetting) {
         if (mouseIsPressed) {
+          print(cell.getY1Rel());
           //only go to cell if the cell can be reached
           if(possibleCells.find(item => item === cell)) {
             if (!started) {
@@ -188,7 +193,7 @@ function checkRectHover() {
             cell.changeColor("green");
             
             //draw time box
-            if (cell.getX1Rel() == 9 && cell.getY1Rel() == 6) {
+            if (cell.isFinalCell) {
               fill("#444444");
               noStroke();
               rect((width/2) - (200/2), 560, 200, 50, 20);
@@ -208,16 +213,16 @@ function getPossibleNeighbors(cell){
   let CellsRtn = [];
 
   if (cell.topWallHidden) {
-    CellsRtn.push(cellArr[cell.getX1Rel() * 420/sizeSetting + cell.getY1Rel() - 1]);
+    CellsRtn.push(cellArr[cell.getX1Rel() * (420/sizeSetting) + cell.getY1Rel() - 1]);
   }
   if (cell.rightWallHidden) {
-    CellsRtn.push(cellArr[(cell.getX1Rel() + 1) * 420/sizeSetting + cell.getY1Rel()]);
+    CellsRtn.push(cellArr[(cell.getX1Rel() + 1) * (420/sizeSetting) + cell.getY1Rel()]);
   }
   if (cell.bottomWallHidden) {
-    CellsRtn.push(cellArr[cell.getX1Rel() * 420/sizeSetting + cell.getY1Rel() + 1]);
+    CellsRtn.push(cellArr[cell.getX1Rel() * (420/sizeSetting) + cell.getY1Rel() + 1]);
   }
   if (cell.leftWallHidden) {
-    CellsRtn.push(cellArr[(cell.getX1Rel() - 1) * 420/sizeSetting + cell.getY1Rel()]);
+    CellsRtn.push(cellArr[(cell.getX1Rel() - 1) * (420/sizeSetting) + cell.getY1Rel()]);
   }
 
 
@@ -247,7 +252,7 @@ function drawPanel() {
       // rectColor.push("black");
       // rectx.push((width/2) - (600/2) + (60 * x));
       // recty.push(110 + (60 * y) - 60);
-      let cell = new Cell((width/2) - (600/2) + (60 * x), 110 + (60 * y) - 60, sizeSetting , "white");
+      let cell = new Cell((width/2) - (600/2) + (sizeSetting * x), 110 + (sizeSetting * y) - 60, sizeSetting , "white");
       cellArr.push(cell);
       cell.display();
     }
@@ -282,7 +287,8 @@ function generateMaze() {
       stack.pop();
     }
   }
-  cellArr[9 * 420/sizeSetting + 6].changeColor("yellow");
+  cellArr[cellArr.length - 1].changeColor("yellow");
+  cellArr[cellArr.length - 1].isFinalCell = true;
 }
 
 function drawMaze() {
@@ -299,6 +305,7 @@ function getRandomInt(min, max) {
 
 function removeWall(currentCell, next) {
   // check direction
+
   if (currentCell.getX1Rel() > next.getX1Rel()) {
     currentCell.breakWall(3);
       next.breakWall(1);
@@ -391,10 +398,33 @@ function makeGamePage() {
   text("Mouse Movement Game", 20, 40);
   homeButton = createButton('Back to Home');
 	
+  easyButton = createButton('Easy');
+  mediumButton = createButton('Medium');
+  hardButton = createButton('Hard');
+
   resetButton = createButton("Reset");
   resetButton.position(width/2 - resetButton/2, 480);
   homeButton.position(width - homeButton.width - 50, 20);
   homeButton.mousePressed(goToHome);
+
+
+  easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)), 20)
+  easyButton.style('background-color', '#444444');
+  easyButton.style('font-family', 'JetBrains Mono');
+  easyButton.style('border', '5px');
+  easyButton.style('border-radius', '5px');
+  
+  mediumButton.position(width/2 - (mediumButton.width/2), 20)
+  mediumButton.style('background-color', '#444444');
+  mediumButton.style('font-family', 'JetBrains Mono');
+  mediumButton.style('border', '5px');
+  mediumButton.style('border-radius', '5px');
+
+  hardButton.position(width/2 - (hardButton.width/2) + (hardButton.width + 8), 20)
+  hardButton.style('background-color', '#444444');
+  hardButton.style('font-family', 'JetBrains Mono');
+  hardButton.style('border', '5px');
+  hardButton.style('border-radius', '5px');
 
   resetButton.mousePressed(reset);
   // Optional styling
@@ -419,6 +449,23 @@ function goToHome() {
 
 function reset() {
   //empty arrays
+  started = false;
+  prevCell = null;
+  cellArr = [];
+  needs_redraw = true;
+  loop();
+}
+
+function changeDifficulty(diff) {
+  if (diff == 0) {
+    sizeSetting = 60;
+  }
+  if (diff == 1) {
+    sizeSetting = 30;
+  }
+  if (diff == 2) {
+    sizeSetting = 10;
+  }
   started = false;
   prevCell = null;
   cellArr = [];
