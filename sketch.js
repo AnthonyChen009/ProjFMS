@@ -406,7 +406,7 @@ function statPanel() {
   if (is_correct.length) {
     wpm = Math.round(calculateScore());
     count = is_correct.filter(item => item === false).length;
-    result = ((is_correct.length - count) / is_correct.length) * 100;
+    result = Math.floor(((is_correct.length - count) / is_correct.length) * 100);
   }
   let keysMissed = calcMissedKeys();
 

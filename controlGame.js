@@ -15,12 +15,14 @@ let prevCell;
 let currentTime = 0;
 let startTime = 0;
 let possibleCells = [];
+let sizeSetting = 60;
 
 //cell class
 class Cell {
-  constructor(x1, y1, color) {
+  constructor(x1, y1, size, color) {
     this.x1 = x1;
     this.y1 = y1;
+    this.size = size;
     this.color = color
     this.topWallHidden = false;
     this.leftWallHidden = false;
@@ -31,20 +33,20 @@ class Cell {
   display() {
     noStroke();
     fill(this.color);
-    rect(this.x1, this.y1, 60, 60);
+    rect(this.x1, this.y1, this.size, this.size);
     stroke('Black');
     strokeWeight(2);
     if (!this.topWallHidden) {
-      line(this.x1, this.y1, this.x1 + 60, this.y1);
+      line(this.x1, this.y1, this.x1 + this.size, this.y1);
     }
     if (!this.rightWallHidden) {
-      line(this.x1 + 60, this.y1, this.x1 + 60, this.y1 + 60);
+      line(this.x1 + this.size, this.y1, this.x1 + this.size, this.y1 + this.size);
     }
     if (!this.bottomWallHidden) {
-      line(this.x1, this.y1 + 60, this.x1 + 60, this.y1 + 60);
+      line(this.x1, this.y1 + this.size, this.x1 + this.size, this.y1 + this.size);
     }
     if (!this.leftWallHidden) {
-      line(this.x1, this.y1, this.x1, this.y1 + 60);
+      line(this.x1, this.y1, this.x1, this.y1 + this.size);
     }
   }
   getX1() {
@@ -55,10 +57,10 @@ class Cell {
   }
 
   getX1Rel() {
-    return (this.x1 - (width / 2) + (300))/ 60;
+    return (this.x1 - (width / 2) + (300))/ this.size;
   }
   getY1Rel() {
-    return (this.y1 + 60 - 110) / 60;
+    return (this.y1 + this.size - 110) / this.size;
   }
 
   changeColor(col){
@@ -141,7 +143,7 @@ function draw() {
     makeGamePage();
 		drawPanel()
     needs_redraw = false;
-    prevCell = cellArr[0 * 7 + 0];
+    prevCell = cellArr[0 * 420/sizeSetting + 0];
     possibleCells = getPossibleNeighbors(prevCell);
     noStroke();
     fill("white");
@@ -168,9 +170,9 @@ function draw() {
 
 
 function checkRectHover() {
-  for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 7; j++) {
-      let cell = cellArr[i * 7 + j];      
+  for (let i = 0; i < 600/sizeSetting; i++) {
+    for (let j = 0; j < 420/sizeSetting; j++) {
+      let cell = cellArr[i * 420/sizeSetting + j];      
 
       if (mouseX >= cell.getX1() && mouseX <= cell.getX1() + 60 && mouseY >= cell.getY1() && mouseY <= cell.getY1() + 60) {
         if (mouseIsPressed) {
@@ -206,16 +208,16 @@ function getPossibleNeighbors(cell){
   let CellsRtn = [];
 
   if (cell.topWallHidden) {
-    CellsRtn.push(cellArr[cell.getX1Rel() * 7 + cell.getY1Rel() - 1]);
+    CellsRtn.push(cellArr[cell.getX1Rel() * 420/sizeSetting + cell.getY1Rel() - 1]);
   }
   if (cell.rightWallHidden) {
-    CellsRtn.push(cellArr[(cell.getX1Rel() + 1) * 7 + cell.getY1Rel()]);
+    CellsRtn.push(cellArr[(cell.getX1Rel() + 1) * 420/sizeSetting + cell.getY1Rel()]);
   }
   if (cell.bottomWallHidden) {
-    CellsRtn.push(cellArr[cell.getX1Rel() * 7 + cell.getY1Rel() + 1]);
+    CellsRtn.push(cellArr[cell.getX1Rel() * 420/sizeSetting + cell.getY1Rel() + 1]);
   }
   if (cell.leftWallHidden) {
-    CellsRtn.push(cellArr[(cell.getX1Rel() - 1) * 7 + cell.getY1Rel()]);
+    CellsRtn.push(cellArr[(cell.getX1Rel() - 1) * 420/sizeSetting + cell.getY1Rel()]);
   }
 
 
@@ -236,16 +238,16 @@ function drawPanel() {
 	rect((width/2) - (600/2), 50, 600, 420, 0);
   
   
-  for (let x = 0; x < 10; x++) {
+  for (let x = 0; x < 600/sizeSetting; x++) {
     
-    for (let y = 0; y < 7; y++) {
+    for (let y = 0; y < 420/sizeSetting; y++) {
       //fill("black");
       // changeCell(x, y, "Black");
       // noStroke();
       // rectColor.push("black");
       // rectx.push((width/2) - (600/2) + (60 * x));
       // recty.push(110 + (60 * y) - 60);
-      let cell = new Cell((width/2) - (600/2) + (60 * x), 110 + (60 * y) - 60, "white");
+      let cell = new Cell((width/2) - (600/2) + (60 * x), 110 + (60 * y) - 60, sizeSetting , "white");
       cellArr.push(cell);
       cell.display();
     }
@@ -280,13 +282,13 @@ function generateMaze() {
       stack.pop();
     }
   }
-  cellArr[9 * 7 + 6].changeColor("yellow");
+  cellArr[9 * 420/sizeSetting + 6].changeColor("yellow");
 }
 
 function drawMaze() {
-  for (let x = 0; x < 10; x++) {
-    for (let y = 0; y < 7; y++) {
-      cellArr[x * 7 + y].display();
+  for (let x = 0; x < 600/sizeSetting; x++) {
+    for (let y = 0; y < 420/sizeSetting; y++) {
+      cellArr[x * 420/sizeSetting + y].display();
     }
   }
 }
@@ -349,9 +351,9 @@ function getUnvisitedNeighbors(cell) {
     
     let neighbor = getNeighbor(cell, dir[i]);
     
-    if ((neighbor[0] >= 0 && neighbor[0] < 10 && neighbor[1] >= 0 && neighbor[1] < 7)) {
-      if (!cellArr[neighbor[0] * 7 + neighbor[1]].visited) {
-        neighbors.push(cellArr[neighbor[0] * 7 + neighbor[1]]);
+    if ((neighbor[0] >= 0 && neighbor[0] < 600/sizeSetting && neighbor[1] >= 0 && neighbor[1] < 420/sizeSetting)) {
+      if (!cellArr[neighbor[0] * 420/sizeSetting + neighbor[1]].visited) {
+        neighbors.push(cellArr[neighbor[0] * 420/sizeSetting + neighbor[1]]);
 
       }
     }
