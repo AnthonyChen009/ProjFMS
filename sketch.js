@@ -38,18 +38,14 @@ let isEnterPressed = false;
 let canReset = true;
 let endEarly = false;
 let timeLeft = 0;
+let selectedSetting;
+
 
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
   jetFont = loadFont("JetBrainsMono-Regular.ttf");
   for(let i = 0; i < word_count; i++) {
     words.push(generate_word());
-  }
-  
-  for(let i = 0; i < word_count; i++) {
-    for (let j = 0; j < words[i].length; j++) {
-      characters.push(words[i].charAt(j));
-    }
   }
   console.log("Finished");
 }
@@ -78,6 +74,7 @@ function draw() {
     makeGamePage();
     make_window();
     statPanel();
+    selectedSetting = time10;
     needs_redraw = false;
     
   }
@@ -165,6 +162,8 @@ function checkHover() {
       button.style('background-color', '#444444');
     }
   }
+
+  selectedSetting.style('background-color', '#FFFFFF');
 }
 
 function keyPressed() {
@@ -178,31 +177,53 @@ function keyPressed() {
     resetSketch();
   }
   is_typing = true;
-  if (key.length === 1 && key.match(/[a-zA-Z]/) && !finished) {
+  if (key.length === 1 && key.match(/[a-zA-Z ]/) && !finished) {
     resetText = true;
     make_window();
-    //rect(xpos[currentX] - 2, ypos[currentY] - 25, 2, 30);
+
     if (key.match(characters[currentX])) {
-      fill("white");
+      if (characters[currentX] === " ") {
+        noStroke();
+        fill("green");
+        rect(xpos[currentX] - 1, ypos[currentY] - 25, textWidth(characters[currentX]), 30);
+      }
+      
+      fill("green");
       text(characters[currentX], xpos[currentX], ypos[currentY]);
       is_correct.push(true);
+      
     }
     else{
+      if (characters[currentX] === " ") {
+        noStroke();
+        fill("red");
+        rect(xpos[currentX] - 1, ypos[currentY] - 25, textWidth(characters[currentX]), 30);
+      }
       fill("red");
       text(characters[currentX], xpos[currentX], ypos[currentY]);
       is_correct.push(false);
     }
+
+    //fill character that were already typed
     for (let i = 0; i < currentX; i++) {
       if (is_correct[i]) {
-        fill("white");
+        fill("green");
         text(characters[i], xpos[i], ypos[i]);
-        
+        if (characters[i] === " ") {
+          noStroke();
+          fill("green");
+          rect(xpos[i] - 1, ypos[i] - 25, textWidth(characters[i]), 30);
+        }
         
       }
       else{
         fill("red");
         text(characters[i], xpos[i], ypos[i]);
-        
+        if (characters[i] === " ") {
+          noStroke();
+          fill("red");
+          rect(xpos[i] - 1, ypos[i] - 25, textWidth(characters[i]), 30);
+        }
       }
     }
 
@@ -237,12 +258,22 @@ function keyPressed() {
 
     for (let i = 0; i < currentX; i++) {
       if (is_correct[i]) {
-        fill("white");
+        fill("green");
         text(characters[i], xpos[i], ypos[i]);
+        if (characters[i] === " ") {
+          noStroke();
+          fill("green");
+          rect(xpos[i] - 1, ypos[i] - 25, textWidth(characters[i]), 30);
+        }
       }
       else{
         fill("red");
-        text(characters[i], xpos[i], ypos[i]);   
+        text(characters[i], xpos[i], ypos[i]);
+        if (characters[i] === " ") {
+          noStroke();
+          fill("red");
+          rect(xpos[i] - 1, ypos[i] - 25, textWidth(characters[i]), 30);
+        }   
       }
     }
   }
@@ -274,11 +305,11 @@ function makeGamePage() {
   time30 = createButton('30 Sec');
 
 
-  time5.mousePressed(() => setTime(5));
-  time10.mousePressed(() => setTime(10));
-  time15.mousePressed(() => setTime(15));
-  time20.mousePressed(() => setTime(20));
-  time30.mousePressed(() => setTime(30));
+  time5.mousePressed(() => setTime(5, time5));
+  time10.mousePressed(() => setTime(10, time10));
+  time15.mousePressed(() => setTime(15, time15));
+  time20.mousePressed(() => setTime(20, time20));
+  time30.mousePressed(() => setTime(30, time30));
 
   time5.position(width/2 - (time5.width/2) - (time5.width + 20 + time10.width), 25)
   time5.style('background-color', '#444444');
@@ -319,8 +350,9 @@ function makeGamePage() {
   homeButton.style('border-radius', '5px');
 }
 
-function setTime(sec) {
+function setTime(sec, button) {
   targetTime = sec * 1000;
+  selectedSetting = button;
 }
 
 function make_window() {
@@ -346,8 +378,14 @@ function make_window() {
         text(words[i].charAt(j), charX, charY);
         xpos.push(charX);
         ypos.push(charY);
-        charX += textWidth(words[i].charAt(j)) ;
-        line_length += textWidth(words[i].charAt(j)) ;
+        charX += textWidth(words[i].charAt(j));
+        line_length += textWidth(words[i].charAt(j));
+        characters.push(words[i].charAt(j));
+        if (j === words[i].length - 1) {
+          xpos.push(charX);
+          ypos.push(charY);
+          characters.push(" ");
+        }
       }
       charX += 15;
       line_length += 15;
@@ -391,7 +429,7 @@ function calcMissedKeys() {
       missed.push(characters[i]);
     }
   }
-
+  //hashmap to reduce the amount of interations
   for (const element of missed) {
     frequencyMap[element] = (frequencyMap[element] || 0) + 1;
 
@@ -418,6 +456,9 @@ function resetWords() {
   for(let i = 0; i < word_count; i++) {
     for (let j = 0; j < words[i].length; j++) {
       characters.push(words[i].charAt(j));
+      if (j === words[i].length - 1) {
+        characters.push(" ");
+      }
     }
   }
   needs_redraw = true;

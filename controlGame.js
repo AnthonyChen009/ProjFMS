@@ -192,7 +192,7 @@ function checkRectHover() {
               rect((width/2) - (200/2), 560, 200, 50, 20);
               fill("white");
               currentTime = millis();
-              text("Time: " + Math.floor(currentTime - startTime) + " ms",(width / 2) - (textWidth("Time " + Math.floor(currentTime - startTime) + " ms")) / 2, 560 + 35);
+              text("Time: " + Math.floor((currentTime - startTime)/1000) + " sec",(width / 2) - 10 - (textWidth("Time " + Math.floor((currentTime - startTime)/1000) + " Sec")) / 2, 560 + 35);
               noLoop();
             }
           }
