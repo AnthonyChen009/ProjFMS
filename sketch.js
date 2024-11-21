@@ -429,7 +429,7 @@ function calcMissedKeys() {
       missed.push(characters[i]);
     }
   }
-  //hashmap to reduce the amount of interations
+  //hashmap to reduce the amount of iterations
   for (const element of missed) {
     frequencyMap[element] = (frequencyMap[element] || 0) + 1;
 

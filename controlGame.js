@@ -15,11 +15,13 @@ let prevCell;
 let currentTime = 0;
 let startTime = 0;
 let possibleCells = [];
-let sizeSetting = 15;
+let sizeSetting = 60;
+
 let easyButton;
 let mediumButton;
 let hardButton;
-let selectedSetting;
+
+let selectedSetting = null;
 //cell class
 class Cell {
   constructor(x1, y1, size, color) {
@@ -135,20 +137,26 @@ function setup() {
   width = windowWidth;
   height = windowHeight;
   createCanvas(width, height);
+
   
 }
 
 function draw() {
 	//only draw if needed
 	if (needs_redraw) {
+    
     resetText = true;
     homeButton = null;
     background("#333437");
     makeGamePage();
+    if (selectedSetting == null) {
+      changeDifficulty(0);
+    }
 		drawPanel()
     needs_redraw = false;
     prevCell = cellArr[0 * 420/sizeSetting + 0];
     possibleCells = getPossibleNeighbors(prevCell);
+    
     noStroke();
     fill("white");
     text("Start at red square and drag to yellow", 20, height - 50);
@@ -156,6 +164,8 @@ function draw() {
   }
   checkRectHover();
 	checkHover();
+  selectedSetting.style('background-color', '#FFFFFF');
+  
   
 	if (!paused && started) {
 		if (!mouseIsPressed) {
@@ -407,6 +417,10 @@ function makeGamePage() {
   homeButton.position(width - homeButton.width - 50, 20);
   homeButton.mousePressed(goToHome);
 
+  easyButton.mousePressed(() => changeDifficulty(0));
+  mediumButton.mousePressed(() => changeDifficulty(1));
+  hardButton.mousePressed(() => changeDifficulty(2));
+
 
   easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)), 20)
   easyButton.style('background-color', '#444444');
@@ -453,19 +467,26 @@ function reset() {
   prevCell = null;
   cellArr = [];
   needs_redraw = true;
-  loop();
+  
 }
 
 function changeDifficulty(diff) {
-  if (diff == 0) {
+  if (diff === 0) {
+    print("Diff: " + diff);
     sizeSetting = 60;
+    selectedSetting = easyButton;
   }
-  if (diff == 1) {
+  if (diff === 1) {
+    print("Diff: " + diff);
     sizeSetting = 30;
+    selectedSetting = mediumButton;
   }
-  if (diff == 2) {
-    sizeSetting = 10;
+  if (diff === 2) {
+    print("Diff: " + diff);
+    sizeSetting = 15;
+    selectedSetting = hardButton;
   }
+  
   started = false;
   prevCell = null;
   cellArr = [];
@@ -475,14 +496,17 @@ function changeDifficulty(diff) {
 
 function checkHover() {
   const buttons = [homeButton, resetButton];
-
+  
   for (const button of buttons) {
     if (button.elt.matches(':hover')) {
       button.style('background-color', '#666666');
     } else {
       button.style('background-color', '#444444');
+      
     }
   }
+  selectedSetting.style('background-color', '#FFFFFF');
+  
 }
 
 function windowResized() {
