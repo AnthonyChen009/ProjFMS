@@ -467,7 +467,7 @@ function reset() {
   prevCell = null;
   cellArr = [];
   needs_redraw = true;
-  
+  loop();
 }
 
 function changeDifficulty(diff) {
