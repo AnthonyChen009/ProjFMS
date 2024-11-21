@@ -181,7 +181,7 @@ function keyPressed() {
     resetText = true;
     make_window();
 
-    if (key.match(characters[currentX])) {
+    if (key.match(characters[currentX]) && currentX < characters.length) {
       if (characters[currentX] === " ") {
         noStroke();
         fill("green");
@@ -227,12 +227,14 @@ function keyPressed() {
       }
     }
 
-    if (currentX < characters.length) {
-      
+    if (currentX < xpos.length) {
+      print("false")
+      print(characters.length);
       currentX++;
       currentY++;
     }
     else{
+      print("true")
       endEarly = true;
     }
     
@@ -355,12 +357,17 @@ function setTime(sec, button) {
   selectedSetting = button;
 }
 
+let check = 0
+
 function make_window() {
   fill("#444444");
   noStroke();
   line_length = 0;
   drawPanel()
   if (resetText) {
+    characters = [];
+    xpos= [];
+    ypos = [];
     charX = ((width/2) - (windowWidth/4) - 100) + 20;
     charY = 100 + 40;
     
@@ -372,6 +379,8 @@ function make_window() {
         line_length = 0;
       }
       for (let j = 0; j < words[i].length; j++) {
+        check++;
+        print(check)
         fill("#656669");
         textSize(30);
         textFont(jetFont);
@@ -385,11 +394,13 @@ function make_window() {
           xpos.push(charX);
           ypos.push(charY);
           characters.push(" ");
+          check++;
         }
       }
       charX += 15;
       line_length += 15;
     }
+    print("chars:" +characters.length)
     resetText = false;
   }
   
@@ -453,14 +464,7 @@ function resetWords() {
     words.push(generate_word());
   }
   
-  for(let i = 0; i < word_count; i++) {
-    for (let j = 0; j < words[i].length; j++) {
-      characters.push(words[i].charAt(j));
-      if (j === words[i].length - 1) {
-        characters.push(" ");
-      }
-    }
-  }
+  
   needs_redraw = true;
   resetText = true;
   console.log("Finished");
