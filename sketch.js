@@ -74,10 +74,18 @@ function draw() {
     makeGamePage();
     make_window();
     statPanel();
-    selectedSetting = time10;
+    if (selectedSetting == null) {
+      selectedSetting = time10;
+    }
+    else{
+      fill("white");
+      selectedSetting.style('background-color', '#FFFFFF');
+      
+    }
     needs_redraw = false;
     
   }
+  
   checkHover();
   //main loop
   if (!paused) {
@@ -161,9 +169,10 @@ function checkHover() {
     } else {
       button.style('background-color', '#444444');
     }
+    selectedSetting.style('background-color', '#FFFFFF');
   }
 
-  selectedSetting.style('background-color', '#FFFFFF');
+  
 }
 
 function keyPressed() {
@@ -228,13 +237,10 @@ function keyPressed() {
     }
 
     if (currentX < xpos.length) {
-      print("false")
-      print(characters.length);
       currentX++;
       currentY++;
     }
     else{
-      print("true")
       endEarly = true;
     }
     
@@ -300,49 +306,50 @@ function makeGamePage() {
   homeButton = createButton('Back to Home');
   homeButton.position(width - homeButton.width - 50, 20);
   homeButton.mousePressed(goToHome);
-  time5 = createButton('5 Sec');
-  time10 = createButton('10 Sec');
-  time15 = createButton('15 Sec');
-  time20 = createButton('20 Sec');
-  time30 = createButton('30 Sec');
+  if (time5 == null){
+    time5 = createButton('5 Sec');
+    time10 = createButton('10 Sec');
+    time15 = createButton('15 Sec');
+    time20 = createButton('20 Sec');
+    time30 = createButton('30 Sec');
 
 
-  time5.mousePressed(() => setTime(5, time5));
-  time10.mousePressed(() => setTime(10, time10));
-  time15.mousePressed(() => setTime(15, time15));
-  time20.mousePressed(() => setTime(20, time20));
-  time30.mousePressed(() => setTime(30, time30));
+    time5.mousePressed(() => setTime(5, time5));
+    time10.mousePressed(() => setTime(10, time10));
+    time15.mousePressed(() => setTime(15, time15));
+    time20.mousePressed(() => setTime(20, time20));
+    time30.mousePressed(() => setTime(30, time30));
 
-  time5.position(width/2 - (time5.width/2) - (time5.width + 20 + time10.width), 25)
-  time5.style('background-color', '#444444');
-  time5.style('font-family', 'JetBrains Mono');
-  time5.style('border', '5px');
-  time5.style('border-radius', '5px');
-  
-  time10.position(width/2 - (time10.width/2) - ((time10.width + 8)), 25)
-  time10.style('background-color', '#444444');
-  time10.style('font-family', 'JetBrains Mono');
-  time10.style('border', '5px');
-  time10.style('border-radius', '5px');
-  
-  time15.position(width/2 - (time15.width/2), 25)
-  time15.style('background-color', '#444444');
-  time15.style('font-family', 'JetBrains Mono');
-  time15.style('border', '5px');
-  time15.style('border-radius', '5px');
+    time5.position(width/2 - (time5.width/2) - (time5.width + 20 + time10.width), 25)
+    time5.style('background-color', '#444444');
+    time5.style('font-family', 'JetBrains Mono');
+    time5.style('border', '5px');
+    time5.style('border-radius', '5px');
+    
+    time10.position(width/2 - (time10.width/2) - ((time10.width + 8)), 25)
+    time10.style('background-color', '#444444');
+    time10.style('font-family', 'JetBrains Mono');
+    time10.style('border', '5px');
+    time10.style('border-radius', '5px');
+    
+    time15.position(width/2 - (time15.width/2), 25)
+    time15.style('background-color', '#444444');
+    time15.style('font-family', 'JetBrains Mono');
+    time15.style('border', '5px');
+    time15.style('border-radius', '5px');
 
-  time20.position(width/2 - (time20.width/2) + (time15.width + 8), 25)
-  time20.style('background-color', '#444444');
-  time20.style('font-family', 'JetBrains Mono');
-  time20.style('border', '5px');
-  time20.style('border-radius', '5px');
+    time20.position(width/2 - (time20.width/2) + (time15.width + 8), 25)
+    time20.style('background-color', '#444444');
+    time20.style('font-family', 'JetBrains Mono');
+    time20.style('border', '5px');
+    time20.style('border-radius', '5px');
 
-  time30.position(time20.x + time30.width + 8, 25)
-  time30.style('background-color', '#444444');
-  time30.style('font-family', 'JetBrains Mono');
-  time30.style('border', '5px');
-  time30.style('border-radius', '5px');
-
+    time30.position(time20.x + time30.width + 8, 25)
+    time30.style('background-color', '#444444');
+    time30.style('font-family', 'JetBrains Mono');
+    time30.style('border', '5px');
+    time30.style('border-radius', '5px');
+  }
   // Optional styling
   homeButton.style('background-color', '#444444');
   homeButton.style('font-family', 'JetBrains Mono');
@@ -353,11 +360,13 @@ function makeGamePage() {
 }
 
 function setTime(sec, button) {
-  targetTime = sec * 1000;
-  selectedSetting = button;
+  if (!game_started) {
+    targetTime = sec * 1000;
+    selectedSetting = button;
+  }
 }
 
-let check = 0
+
 
 function make_window() {
   fill("#444444");
@@ -379,8 +388,6 @@ function make_window() {
         line_length = 0;
       }
       for (let j = 0; j < words[i].length; j++) {
-        check++;
-        print(check)
         fill("#656669");
         textSize(30);
         textFont(jetFont);
@@ -394,13 +401,11 @@ function make_window() {
           xpos.push(charX);
           ypos.push(charY);
           characters.push(" ");
-          check++;
         }
       }
       charX += 15;
       line_length += 15;
     }
-    print("chars:" +characters.length)
     resetText = false;
   }
   

@@ -1,5 +1,5 @@
 let jetFont;
-let count = 30;
+let count = 15;
 let timeToHit = [];
 let needs_redraw = true;
 let homeButton;
@@ -11,6 +11,11 @@ let targetButton;
 let startTime = 0;
 let currentTime = 0;
 let resetButton;
+let averageTimes = [];
+
+let easyButton;
+let mediumButton;
+let hardButton;
 
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
@@ -34,7 +39,8 @@ function draw() {
     homeButton = null;
     background("#333437");
     makeGamePage();
-		drawPanel()
+		drawPanel();
+    top5Times();
     needs_redraw = false;
     
   }
@@ -48,6 +54,25 @@ function drawPanel() {
 	fill("#444444");
   noStroke();
 	rect((width/2) - (600/2), 50, 600, 400, 20);
+}
+
+function top5Times(){
+  print("e")
+  print(averageTimes)
+  fill("#444444");
+  noStroke();
+  rect(20, 70, 250, 600, 20);
+  fill("white");
+  text("Top 5 Times:", 40, 100);
+  for (let i = 0; i < 5; i++) {
+    if (averageTimes.length != 0 && i < averageTimes.length) {
+      text(i + ".) " + averageTimes[i], 40, 100 + 30 + (30 * i));
+      print("w")
+    }
+    else{
+      text((i + 1) + ".) ", 40, 100 + 30 + (30 * i));
+    } 
+  }
 }
 
 function gameLoop() {
@@ -64,7 +89,7 @@ function gameLoop() {
     currentTime = millis();
     timeToHit.push(currentTime - startTime);
   }
-  console.log(timeToHit);
+  
 	drawPanel();
   count--;
 
@@ -76,18 +101,41 @@ function gameLoop() {
   fill("white");
   text("Remaining: " + count,(width / 2) - (textWidth("Remaining: " + count)/2), 535);
   if (count <= 0) {
+    
     let avg = 0;
     for (let i = 0; i < timeToHit.length; i++) {
       avg += timeToHit[i];
     }
     avg /= timeToHit.length;
+    if (averageTimes.length < 5) {
+      averageTimes.push(Math.floor(avg));
+      averageTimes.sort((a, b) => b - a);
+    }
+    else {
+      //remove 
+      removeLargest(averageTimes);
+      averageTimes.push(Math.floor(avg));
+      averageTimes.sort((a, b) => a - b);
+    }
     //noLoop();
     fill("#444444");
     rect((width/2) - (200/2), 560, 200, 50, 20);
     fill("white");
+    
+    
     text("Time: " + Math.floor(avg) + " ms",(width / 2) - (textWidth("Time " + (Math.floor(avg))  + " ms")) / 2, 560 + 35);
+    top5Times();
   }
 
+}
+
+function removeLargest(arr) {
+  const max = Math.max(...arr);
+  const index = arr.indexOf(max);
+  if (index > -1) {
+      arr.splice(index, 1);
+  }
+  return arr;
 }
 
 function makeGamePage() {
@@ -99,6 +147,30 @@ function makeGamePage() {
   text("Mouse Accuracy Game", 20, 40);
   homeButton = createButton('Back to Home');
 	
+  if (easyButton == null) {
+    easyButton = createButton('5 Targets');
+    mediumButton = createButton('15 Targets');
+    hardButton = createButton('30 Targets');
+
+    easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)) - 10, 20)
+    easyButton.style('background-color', '#444444');
+    easyButton.style('font-family', 'JetBrains Mono');
+    easyButton.style('border', '5px');
+    easyButton.style('border-radius', '5px');
+    
+    mediumButton.position(width/2 - (mediumButton.width/2), 20)
+    mediumButton.style('background-color', '#444444');
+    mediumButton.style('font-family', 'JetBrains Mono');
+    mediumButton.style('border', '5px');
+    mediumButton.style('border-radius', '5px');
+
+    hardButton.position(width/2 - (hardButton.width/2) + (hardButton.width + 8) + 8, 20)
+    hardButton.style('background-color', '#444444');
+    hardButton.style('font-family', 'JetBrains Mono');
+    hardButton.style('border', '5px');
+    hardButton.style('border-radius', '5px');
+  }
+
 	targetButton.position(width/2 - targetButton/2, 235);
   targetButton.mousePressed(gameLoop);
   resetButton = createButton("Reset");
@@ -142,7 +214,6 @@ function goToHome() {
 }
 
 function reset(){
-  count = 30;
   timeToHit = [];
   makeGamePage();
   targetButton.position((width/2) - (targetButton.width/2) - 10, 235);

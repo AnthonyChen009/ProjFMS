@@ -146,11 +146,10 @@ function draw() {
 	if (needs_redraw) {
     
     resetText = true;
-    homeButton = null;
     background("#333437");
     makeGamePage();
     if (selectedSetting == null) {
-      changeDifficulty(0);
+      changeDifficulty(0, easyButton);
     }
 		drawPanel()
     needs_redraw = false;
@@ -406,39 +405,43 @@ function makeGamePage() {
   fill("white");
   noStroke();
   text("Mouse Movement Game", 20, 40);
-  homeButton = createButton('Back to Home');
-	
-  easyButton = createButton('Easy');
-  mediumButton = createButton('Medium');
-  hardButton = createButton('Hard');
-
-  resetButton = createButton("Reset");
-  resetButton.position(width/2 - resetButton/2, 480);
-  homeButton.position(width - homeButton.width - 50, 20);
-  homeButton.mousePressed(goToHome);
-
-  easyButton.mousePressed(() => changeDifficulty(0));
-  mediumButton.mousePressed(() => changeDifficulty(1));
-  hardButton.mousePressed(() => changeDifficulty(2));
-
-
-  easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)), 20)
-  easyButton.style('background-color', '#444444');
-  easyButton.style('font-family', 'JetBrains Mono');
-  easyButton.style('border', '5px');
-  easyButton.style('border-radius', '5px');
   
-  mediumButton.position(width/2 - (mediumButton.width/2), 20)
-  mediumButton.style('background-color', '#444444');
-  mediumButton.style('font-family', 'JetBrains Mono');
-  mediumButton.style('border', '5px');
-  mediumButton.style('border-radius', '5px');
+	
+  if (homeButton == null) {
+    homeButton = createButton('Back to Home');
+    easyButton = createButton('Easy');
+    mediumButton = createButton('Medium');
+    hardButton = createButton('Hard');
 
-  hardButton.position(width/2 - (hardButton.width/2) + (hardButton.width + 8), 20)
-  hardButton.style('background-color', '#444444');
-  hardButton.style('font-family', 'JetBrains Mono');
-  hardButton.style('border', '5px');
-  hardButton.style('border-radius', '5px');
+    resetButton = createButton("Reset");
+    resetButton.position(width/2 - resetButton/2, 480);
+    homeButton.position(width - homeButton.width - 50, 20);
+    homeButton.mousePressed(goToHome);
+
+    
+
+
+    easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)), 20)
+    easyButton.style('background-color', '#444444');
+    easyButton.style('font-family', 'JetBrains Mono');
+    easyButton.style('border', '5px');
+    easyButton.style('border-radius', '5px');
+    
+    mediumButton.position(width/2 - (mediumButton.width/2), 20)
+    mediumButton.style('background-color', '#444444');
+    mediumButton.style('font-family', 'JetBrains Mono');
+    mediumButton.style('border', '5px');
+    mediumButton.style('border-radius', '5px');
+
+    hardButton.position(width/2 - (hardButton.width/2) + (hardButton.width + 8), 20)
+    hardButton.style('background-color', '#444444');
+    hardButton.style('font-family', 'JetBrains Mono');
+    hardButton.style('border', '5px');
+    hardButton.style('border-radius', '5px');
+  }
+  easyButton.mousePressed(() => changeDifficulty(0, easyButton));
+  mediumButton.mousePressed(() => changeDifficulty(1, mediumButton));
+  hardButton.mousePressed(() => changeDifficulty(2, hardButton));
 
   resetButton.mousePressed(reset);
   // Optional styling
@@ -463,6 +466,7 @@ function goToHome() {
 
 function reset() {
   //empty arrays
+  
   started = false;
   prevCell = null;
   cellArr = [];
@@ -470,7 +474,7 @@ function reset() {
   loop();
 }
 
-function changeDifficulty(diff) {
+function changeDifficulty(diff, button) {
   if (diff === 0) {
     print("Diff: " + diff);
     sizeSetting = 60;
@@ -486,7 +490,7 @@ function changeDifficulty(diff) {
     sizeSetting = 15;
     selectedSetting = hardButton;
   }
-  
+  selectedSetting = button;
   started = false;
   prevCell = null;
   cellArr = [];
@@ -495,7 +499,7 @@ function changeDifficulty(diff) {
 }
 
 function checkHover() {
-  const buttons = [homeButton, resetButton];
+  const buttons = [homeButton, resetButton, easyButton, mediumButton, hardButton];
   
   for (const button of buttons) {
     if (button.elt.matches(':hover')) {
