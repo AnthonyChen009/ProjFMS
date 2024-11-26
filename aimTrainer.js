@@ -17,6 +17,9 @@ let easyButton;
 let mediumButton;
 let hardButton;
 
+let selectedSetting;
+let savedTarget;
+
 function preload() {
   //ubuntuFont = loadFont("Ubuntu-Regular.ttf");
   jetFont = loadFont("JetBrainsMono-Regular.ttf");
@@ -26,6 +29,7 @@ function setup() {
 	loadFont("JetBrainsMono-Regular.ttf", font => {
     textFont(font);
   });
+  loadAverageTimes();
 	width = windowWidth;
   height = windowHeight;
   createCanvas(width, height);
@@ -42,13 +46,32 @@ function draw() {
 		drawPanel();
     top5Times();
     needs_redraw = false;
+    if (selectedSetting == null) {
+      selectedSetting = mediumButton;
+      savedTarget = 20;
+    }
     
   }
 	checkHover()
-	if (!paused && started) {
-		gameLoop();
-	}
+	
 }
+
+function saveAverageTimes() {
+  localStorage.setItem("averageTimes", JSON.stringify(averageTimes));
+  console.log("averageTimes saved!");
+}
+
+function loadAverageTimes() {
+  const savedTimes = localStorage.getItem("averageTimes");
+
+  if (savedTimes) {
+    averageTimes = JSON.parse(savedTimes);
+    console.log("averageTimes loaded:", averageTimes);
+  } else {
+    console.log("No saved averageTimes found.");
+  }
+}
+
 
 function drawPanel() {
 	fill("#444444");
@@ -66,7 +89,7 @@ function top5Times(){
   text("Top 5 Times:", 40, 100);
   for (let i = 0; i < 5; i++) {
     if (averageTimes.length != 0 && i < averageTimes.length) {
-      text(i + ".) " + averageTimes[i], 40, 100 + 30 + (30 * i));
+      text(i + ".) " + averageTimes[i] + " ms", 40, 100 + 30 + (30 * i));
       print("w")
     }
     else{
@@ -77,7 +100,7 @@ function top5Times(){
 
 function gameLoop() {
 
-  
+  started = true;
   if (count <= 0) {
     return;
   }
@@ -101,7 +124,7 @@ function gameLoop() {
   fill("white");
   text("Remaining: " + count,(width / 2) - (textWidth("Remaining: " + count)/2), 535);
   if (count <= 0) {
-    
+    started = false;
     let avg = 0;
     for (let i = 0; i < timeToHit.length; i++) {
       avg += timeToHit[i];
@@ -148,8 +171,8 @@ function makeGamePage() {
   homeButton = createButton('Back to Home');
 	
   if (easyButton == null) {
-    easyButton = createButton('5 Targets');
-    mediumButton = createButton('15 Targets');
+    easyButton = createButton('10 Targets');
+    mediumButton = createButton('20 Targets');
     hardButton = createButton('30 Targets');
 
     easyButton.position(width/2 - (easyButton.width/2) - ((easyButton.width + 8)) - 10, 20)
@@ -169,6 +192,11 @@ function makeGamePage() {
     hardButton.style('font-family', 'JetBrains Mono');
     hardButton.style('border', '5px');
     hardButton.style('border-radius', '5px');
+
+    easyButton.mousePressed(() => changeDifficulty(10, easyButton));
+    mediumButton.mousePressed(() => changeDifficulty(20, mediumButton));
+    hardButton.mousePressed(() => changeDifficulty(30, hardButton));
+
   }
 
 	targetButton.position(width/2 - targetButton/2, 235);
@@ -198,6 +226,14 @@ function makeGamePage() {
   resetButton.style('border-radius', '5px');
 }
 
+function changeDifficulty(num, button) {
+  if (!started) {
+    selectedSetting = button;
+    count = num;
+    savedTarget = num;
+  }
+}
+
 function windowResized() {
 	
   background("#333437");
@@ -210,18 +246,23 @@ function windowResized() {
 }
 
 function goToHome() {
+  saveAverageTimes();
   window.location.href = 'index.html';
+
 }
 
 function reset(){
+  print(savedTarget)
+  started = false;
   timeToHit = [];
   makeGamePage();
   targetButton.position((width/2) - (targetButton.width/2) - 10, 235);
+  count = savedTarget;
   needs_redraw = true;
 }
 
 function checkHover() {
-  const buttons = [homeButton, resetButton];
+  const buttons = [homeButton, resetButton, easyButton, mediumButton, hardButton];
 
   for (const button of buttons) {
     if (button.elt.matches(':hover')) {
@@ -235,4 +276,6 @@ function checkHover() {
 	} else {
 		targetButton.style('background-color', '#0ced4f');
 	}
+
+  selectedSetting.style('background-color', '#ffffff');
 }

@@ -5,8 +5,8 @@ let homeButton;
 let resetButton;
 let paused = false;
 let started = false;
-let rectx = [];
-let recty = [];
+
+let averageTimes = [];
 let cellArr= [];
 let is_hovered = false;
 let lineArrVertical = [];
@@ -134,6 +134,7 @@ function setup() {
   loadFont("JetBrainsMono-Regular.ttf", font => {
     textFont(font);
   });
+  loadAverageTimes();
   width = windowWidth;
   height = windowHeight;
   createCanvas(width, height);
@@ -151,7 +152,8 @@ function draw() {
     if (selectedSetting == null) {
       changeDifficulty(0, easyButton);
     }
-		drawPanel()
+		drawPanel();
+    top5Times();
     needs_redraw = false;
     prevCell = cellArr[0 * 420/sizeSetting + 0];
     possibleCells = getPossibleNeighbors(prevCell);
@@ -180,6 +182,24 @@ function draw() {
   
 }
 
+function top5Times(){
+  print("e")
+  print(averageTimes)
+  fill("#444444");
+  noStroke();
+  rect(20, 70, 250, 600, 20);
+  fill("white");
+  text("Top 5 Times:", 40, 100);
+  for (let i = 0; i < 5; i++) {
+    if (averageTimes.length != 0 && i < averageTimes.length) {
+      text(i + ".) " + averageTimes[i] + " Seconds", 40, 100 + 30 + (30 * i));
+      print("w")
+    }
+    else{
+      text((i + 1) + ".) ", 40, 100 + 30 + (30 * i));
+    } 
+  }
+}
 
 
 function checkRectHover() {
@@ -200,7 +220,7 @@ function checkRectHover() {
             prevCell = cell;
             possibleCells = getPossibleNeighbors(cell);
             cell.changeColor("green");
-            
+            print("start: " + currentTime);
             //draw time box
             if (cell.isFinalCell) {
               fill("#444444");
@@ -208,7 +228,19 @@ function checkRectHover() {
               rect((width/2) - (200/2), 560, 200, 50, 20);
               fill("white");
               currentTime = millis();
+              print(currentTime);
+              if (averageTimes.length < 5) {
+                averageTimes.push(Math.floor((currentTime - startTime)/1000));
+                averageTimes.sort((a, b) => b - a);
+              }
+              else {
+                //remove 
+                removeLargest(averageTimes);
+                averageTimes.push(Math.floor((currentTime - startTime)/1000));
+                averageTimes.sort((a, b) => a - b);
+              }
               text("Time: " + Math.floor((currentTime - startTime)/1000) + " sec",(width / 2) - 10 - (textWidth("Time " + Math.floor((currentTime - startTime)/1000) + " Sec")) / 2, 560 + 35);
+              top5Times();
               noLoop();
             }
           }
@@ -217,6 +249,32 @@ function checkRectHover() {
     } 
   }  
 }
+
+function removeLargest(arr) {
+  const max = Math.max(...arr);
+  const index = arr.indexOf(max);
+  if (index > -1) {
+      arr.splice(index, 1);
+  }
+  return arr;
+}
+
+function saveAverageTimes() {
+  localStorage.setItem("averageTimesMaze", JSON.stringify(averageTimes));
+  console.log("averageTimes saved!");
+}
+
+function loadAverageTimes() {
+  const savedTimes = localStorage.getItem("averageTimesMaze");
+
+  if (savedTimes) {
+    averageTimes = JSON.parse(savedTimes);
+    console.log("averageTimes loaded:", averageTimes);
+  } else {
+    console.log("No saved averageTimes found.");
+  }
+}
+
 
 function getPossibleNeighbors(cell){
   let CellsRtn = [];
@@ -245,8 +303,6 @@ function drawRect() {
 }
 
 function drawPanel() {
-  rectx = [];
-  recty = [];
 	fill("#444444");
   stroke('white');
 	rect((width/2) - (600/2), 50, 600, 420, 0);
@@ -461,6 +517,7 @@ function makeGamePage() {
 
 
 function goToHome() {
+  saveAverageTimes();
   window.location.href = 'index.html';
 }
 
